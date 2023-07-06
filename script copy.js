@@ -1,26 +1,18 @@
 const game = (() => {
-
-    const path = window.location.pathname;
-    const page = path.split("/").pop();
     const restartButton = document.getElementById('restart-btn');
     const winnerName = document.getElementById('winner');
-    let gameEnded = 0;
     //CREATE PLAYERS
     function Player(name,mark,position) {
         this.name = name
         this.mark = mark;
         this.position = position;
         this.winner = function() {
-            playerMove.stopGame(this.name);
+            playerMove.stopGame(name);
         }
     }
 
     const playerOne = new Player("Player 1", "O",[]);
     const playerTwo = new Player("Player 2", "X",[]);
-    if(page == 'pve.html') {
-        playerOne.name = 'Player';
-        playerTwo.name = 'Computer';
-    }
 
     //WINNING COMBINATIONS
     const checkWinner = (() => {
@@ -74,28 +66,22 @@ const game = (() => {
                 return false;
             } else {
                 if(turn % 2 == 0) {
-                    if(page == 'pve.html') {
-                        return false;
-                    } else {
-                        e.target.innerText = playerTwo.mark;
-                        board[e.target.id] = playerTwo.mark;
-                        turn++;
-                        playerTwo.position.push(Number(e.target.id));
-                        checkWinner();
-                    }
+                    e.target.innerText = playerTwo.mark;
+                    board[e.target.id] = playerTwo.mark;
+                    turn++;
+                    playerTwo.position.push(Number(e.target.id));
+                    checkWinner();
                 } else {
                     e.target.innerText = playerOne.mark;
                     board[e.target.id] = playerOne.mark;
                     turn++;
                     playerOne.position.push(Number(e.target.id));
                     checkWinner();
-                    if(page == 'pve.html') computerMove();
                 }
             }
         }
         //DISABLE BUTTONS AND ENEBLE RESTART BUTTON
         const stopGame = (winner) => {
-            gameEnded = 1;
             restartButton.style.display = 'block';
             let boardTiles = document.querySelectorAll('.board');
             boardTiles.forEach(element => element.removeEventListener("click", startGame));
@@ -108,7 +94,6 @@ const game = (() => {
         }
         //RESETS GAME AND RESETS DATA
         const restartGame = () => {
-            gameEnded = 0;
             restartButton.style.display = 'none';
             winnerName.innerText = '';
             let boardTiles = document.querySelectorAll('.board');
@@ -123,23 +108,7 @@ const game = (() => {
             ];
             playerMove.makeButtonsClickable();
         }
-
-        const computerMove = () => {
-            let randomMove = Math.floor(Math.random() * 8);
-            let boardTiles = document.querySelectorAll('.board');
-            if(boardTiles[randomMove].innerText == '' && gameEnded == 0) {
-                boardTiles[randomMove].innerText = playerTwo.mark;
-                board[randomMove] = playerTwo.mark;
-                turn++;
-                playerTwo.position.push(Number(randomMove));
-                checkWinner();
-            } else {
-                computerMove();
-            }
-
-        }
-
-        return {stopGame,makeButtonsClickable,computerMove};
+        return {stopGame,makeButtonsClickable};
     })();
     playerMove.makeButtonsClickable();
 })();
